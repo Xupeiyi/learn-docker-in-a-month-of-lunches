@@ -65,12 +65,41 @@ RUN npm install
 # app
 FROM diamol/node
 
-EXPOSE
-80
+EXPOSE 80
 CMD ["node", "server.js"]
 
 WORKDIR /app
 COPY --from=builder /src/node_modules/ app/node_modules/
 COPY src/ .
 ```
+(why can the CMD be written before the source code and dependencies are copied?)
 
+
+## 4.4 App walkthrough: Go source code
+```
+FROM diamol/golang AS builder
+COPY main.go .
+
+RUN go build -o /server
+
+# app
+FROM diamol/base
+
+ENV IMAGE_API_URL="http://iotd/image" \
+    ACCESS_API_URL="http://accesslog/access-log"
+CMD ["/web/server"]
+
+WORKDIR web
+COPY index.html .
+COPY --from=builder /server .
+RUN chmod +x server
+```
+Go compiles to native binaries. 
+Go applications don't usually fetch dependencies.
+By using a minimal base image for the application, we saved almost 750 MB.
+
+## 4.5 Understanding multi-stage Dockerfiles
+Why its useful:
+1. Standardization. Different users will build and run the app in the same way.
+2. Performance. Each stage is cached.
+3. Build can be fine-tuned and image is lean. Tools aren't present in the final image. 
