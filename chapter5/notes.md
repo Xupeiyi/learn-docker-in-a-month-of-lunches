@@ -11,9 +11,12 @@ Domain's default is docker.io. Tag's default is latest.
 Always tag the image to specify the application version.
 
 ## 5.2 Pushing your own images to Docker Hub
-One image can have several references.
+Step1: log in to the registry with the Docker command line
+Step2: give your image a reference that includes the name of an account where you have permission to push. e.g.: 
+```
+docker image tag image-gallery $dockerId/image-gallery:v1
+```
 
-
-
+One image can have several references. 
 
 Registries work with image layers. If some layers are already in the registry, they won't be physically uploaded.
